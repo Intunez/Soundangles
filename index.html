@@ -1,1 +1,621 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Soundangles — Level 1: Binnen of buitenhoek</title>
+
+  <style>
+    :root{
+      --bg1:#1a0b2e; --bg2:#3b0b4e; --panel:#1d1233; --ink:#f8f1ff; --muted:#d7c8ef;
+      --accent:#ff52d9; --accent2:#a855f7; --good:#22c55e; --bad:#ef4444;
+      --speakerGlow: rgba(255,82,217,.45);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:"Nunito",system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif;
+      color:var(--ink);
+      background:radial-gradient(1400px 800px at 70% -10%, var(--bg2) 0%, var(--bg1) 60%);
+    }
+
+    /* ===== Concert background layers ===== */
+    .bg-layers{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .audience{
+      position:absolute;
+      left:0;
+      right:0;
+      top:0;
+      height:22vh;
+      opacity:1;
+      filter:blur(.4px) contrast(1.1);
+    }
+    .truss-line{
+      position:absolute;left:0;right:0;top:18vh;height:8px;
+      background:repeating-linear-gradient(90deg, rgba(255,255,255,.22) 0 6px, transparent 6px 12px);
+      opacity:.35; filter:drop-shadow(0 2px 6px rgba(0,0,0,.5));
+    }
+
+    .beams{
+      position:absolute;
+      inset:0;
+      opacity:.55;
+    }
+    .beams:before,.beams:after{
+      content:"";position:absolute;top:-10%;bottom:-10%;width:28%;
+      background:linear-gradient(90deg, rgba(255,82,217,0), rgba(255,82,217,.45), rgba(255,82,217,0));
+      transform:skewX(-18deg);filter:blur(4px)
+    }
+    .beams:before{left:-20%;animation:beamA 14s linear infinite}
+    .beams:after{left:40%;animation:beamB 18s linear infinite;opacity:.9}
+    @keyframes beamA{0%{transform:translateX(0) skewX(-18deg)}100%{transform:translateX(160%) skewX(-18deg)}}
+    @keyframes beamB{0%{transform:translateX(0) skewX(-18deg)}100%{transform:translateX(-160%) skewX(-18deg)}}
+
+    .smoke{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;mix-blend-mode:screen}
+    .smoke:before{
+      content:"";position:absolute;left:-10%;right:-10%;bottom:-20%;top:40%;
+      background:
+        radial-gradient(120px 80px at 10% 90%, rgba(200,200,220,.14) 0, transparent 60%),
+        radial-gradient(120px 80px at 40% 100%, rgba(200,200,220,.14) 0, transparent 60%),
+        radial-gradient(120px 80px at 70% 85%, rgba(200,200,220,.14) 0, transparent 60%),
+        radial-gradient(120px 80px at 90% 100%, rgba(200,200,220,.14) 0, transparent 60%);
+      filter:blur(12px); animation:smokeUp 18s linear infinite; background-blend-mode:screen
+    }
+    @keyframes smokeUp{0%{transform:translateY(0)}100%{transform:translateY(-40%)}}
+    .smoke.on{opacity:.8}
+    .smoke.major{--smoke: rgba(255,120,220,.18)}
+    .smoke.minor{--smoke: rgba(140,170,255,.18)}
+
+    /* ===== App layout ===== */
+    .wrap{
+      position:relative;
+      z-index:1;
+      max-width:980px;
+      margin:160px auto 0;
+      padding:14px;
+      display:flex;
+      flex-direction:column;
+      gap:10px
+    }
+    header{display:flex;gap:12px;align-items:center;justify-content:space-between}
+    h1{font-size:clamp(22px,2.8vw,34px);margin:0 0 2px 0;letter-spacing:.4px}
+
+    .panel{
+      background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:14px 16px;
+      box-shadow:0 12px 30px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:10px
+    }
+    button{
+      appearance:none;border:none;border-radius:18px;padding:10px 14px;font-weight:900;cursor:pointer;
+      background:linear-gradient(180deg,var(--accent),var(--accent2));color:#160824;
+      transition:.15s transform ease,.2s filter ease;font-size:16px
+    }
+    button:hover{filter:brightness(1.06)}
+    button:active{transform:translateY(1px)}
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border:1px solid rgba(255,255,255,.14);border-radius:999px;font-size:13px;color:var(--muted);backdrop-filter:blur(3px)}
+
+    .toprow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    #prompt{margin:2px 0 0 0;font-size:24px}
+    .muted{color:var(--muted)} .small{font-size:13px}
+
+    .diagram-wrap{
+      position:relative;border-radius:18px;padding:8px;
+      background:
+        linear-gradient(90deg, rgba(255,82,217,.28), rgba(168,85,247,.28)) padding-box,
+        linear-gradient(90deg, rgba(255,255,255,.18), rgba(255,255,255,.06)) border-box;
+      border:2px solid transparent;
+    }
+    .diagram{width:100%;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));border-radius:14px;position:relative;overflow:hidden}
+    svg{width:100%;height:100%}
+
+    .controls{display:grid;grid-template-columns:1fr;gap:10px;align-items:center}
+    .left-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .options{display:grid;gap:10px;grid-template-columns:repeat(2,1fr)}
+    .opt{
+      padding:16px;border-radius:16px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.08);
+      cursor:pointer;font-weight:900;text-align:center;font-size:20px;min-height:56px;
+      display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,.25)
+    }
+    .opt:hover{background:rgba(255,255,255,.12)}
+    .opt.correct{outline:4px solid var(--good);background:rgba(34,197,94,.16)}
+    .opt.wrong{outline:4px solid var(--bad);background:rgba(239,68,68,.14)}
+
+    .hud{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .progress{display:flex;gap:6px;align-items:center}
+    .dot{width:12px;height:12px;border-radius:50%;background:#2a2347;border:1px solid rgba(255,255,255,.18);opacity:.85;transition:transform .2s ease, background .2s ease}
+    .dot.active{background:linear-gradient(180deg,var(--accent),var(--accent2));transform:scale(1.2)}
+    .dot.done{background:#da7df4;opacity:1}
+
+    .fade{animation:fade .3s ease}
+    @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    .pulse{position:absolute;width:24px;height:24px;border-radius:999px;border:2px solid var(--accent);transform:translate(-50%,-50%);pointer-events:none;animation:pulse 1.1s ease-out 2}
+    @keyframes pulse{0%{opacity:.9;box-shadow:0 0 0 0 rgba(255,82,217,.6)}70%{opacity:.3;box-shadow:0 0 0 16px rgba(255,82,217,0)}100%{opacity:0;box-shadow:0 0 0 0 rgba(255,82,217,0)}}
+
+    .overlay{position:fixed;inset:0;background:rgba(10,6,18,.88);display:none;align-items:center;justify-content:center;z-index:60}
+    .endbox{background:var(--panel);border:1px solid rgba(255,255,255,.12);padding:22px;border-radius:20px;max-width:520px;text-align:center}
+
+    .speakers{
+      position:fixed;
+      left:0;
+      right:0;
+      bottom:80px;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      padding:0 28px;
+      z-index:2;
+      pointer-events:none;
+    }
+    .speaker{
+      width:120px;height:200px;border-radius:12px;background:#120a20;
+      border:1px solid rgba(255,255,255,.14);box-shadow:0 14px 38px rgba(0,0,0,.6) inset, 0 10px 28px rgba(0,0,0,.35);
+      position:relative;transform:translateY(0);transition:transform .06s ease;
+    }
+    .speaker:before,.speaker:after{
+      content:"";position:absolute;left:50%;transform:translateX(-50%);border-radius:50%;
+      background:radial-gradient(circle at 35% 35%, #3a2a4d 0 30%, #140b22 31% 100%);
+      box-shadow:0 0 0 5px rgba(255,255,255,.1) inset, 0 2px 6px rgba(0,0,0,.5)
+    }
+    .speaker:before{top:14px;width:88px;height:88px}
+    .speaker:after{bottom:14px;width:76px;height:76px}
+    .speaker.glow{box-shadow:0 14px 38px rgba(0,0,0,.6) inset, 0 0 18px var(--speakerGlow), 0 0 60px rgba(255,82,217,.25)}
+
+    .audience.applause{
+      animation:applauseMove 0.6s ease-out 0s 4 alternate;
+    }
+    @keyframes applauseMove{
+      0%{transform:translateY(0) scaleY(1);}
+      50%{transform:translateY(-6px) scaleY(1.04);}
+      100%{transform:translateY(0) scaleY(1);}
+    }
+
+    @media (max-height:760px){
+      #prompt{font-size:20px}
+      .opt{font-size:18px;min-height:52px}
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-layers">
+    <svg class="audience" viewBox="0 0 1200 240" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,200
+               C50,190 80,170 110,175
+               C140,180 165,165 190,168
+               C215,171 235,160 260,166
+               C285,172 310,162 340,168
+               C370,174 395,160 420,165
+               C445,170 475,158 505,166
+               C535,174 560,160 585,165
+               C610,170 640,158 670,165
+               C700,172 725,160 755,164
+               C785,168 815,158 845,164
+               C875,170 900,160 930,166
+               C960,172 985,160 1015,166
+               C1045,172 1080,162 1120,170
+               L1200,180 L1200,240 L0,240 Z"
+            fill="#05050b"/>
+      <g fill="#101018" opacity="0.9">
+        <circle cx="90" cy="180" r="10"/><circle cx="115" cy="176" r="12"/>
+        <circle cx="210" cy="172" r="11"/><circle cx="238" cy="168" r="10"/>
+        <circle cx="330" cy="170" r="12"/><circle cx="360" cy="168" r="10"/>
+        <circle cx="470" cy="168" r="11"/><circle cx="498" cy="166" r="10"/>
+        <circle cx="610" cy="168" r="11"/><circle cx="640" cy="166" r="10"/>
+        <circle cx="760" cy="166" r="11"/><circle cx="790" cy="164" r="10"/>
+        <circle cx="910" cy="166" r="11"/><circle cx="940" cy="164" r="10"/>
+        <circle cx="1060" cy="168" r="11"/><circle cx="1090" cy="166" r="10"/>
+      </g>
+      <rect x="0" y="0" width="1200" height="240" fill="url(#fade)" opacity=".55"/>
+      <defs>
+        <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#1a1a24"/>
+          <stop offset="40%" stop-color="#1a1a24" stop-opacity=".6"/>
+          <stop offset="100%" stop-color="#1a1a2400" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    <div class="truss-line"></div>
+    <div class="beams"></div>
+    <div class="smoke" id="smoke"></div>
+  </div>
+
+  <div class="speakers">
+    <div class="speaker" id="spLeft"></div>
+    <div class="speaker" id="spRight"></div>
+  </div>
+
+  <div class="wrap">
+    <header>
+      <h1>LEVEL 1 — Binnen of buitenhoek</h1>
+      <div class="hud">
+        <div class="progress" id="progress"></div>
+        <span class="pill">Vraag <strong id="round">1</strong>/10</span>
+        <span class="pill">Score <strong id="score">0</strong></span>
+        <button id="reset">Herstart</button>
+      </div>
+    </header>
+
+    <section class="panel fade" id="panel">
+      <div class="toprow">
+        <div>
+          <h2 id="prompt">…</h2>
+          <div class="muted small">Is de opgelichte hoek een <strong>binnenhoek</strong> of een <strong>buitenhoek</strong>?</div>
+        </div>
+        <button id="next">Volgende vraag</button>
+      </div>
+
+      <div class="diagram-wrap">
+        <div class="diagram" id="diagram"></div>
+      </div>
+
+      <div class="controls">
+        <div class="left-controls">
+          <button id="listen">🎵 Nog eens luisteren</button>
+          <button id="stopAudio">⏹ Stop muziek</button>
+          <span class="pill">Niveau <strong id="lvl">1</strong></span>
+        </div>
+        <div class="options" id="options"></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="overlay" id="end">
+    <div class="endbox">
+      <h2 style="margin:0 0 6px 0">Level completed!</h2>
+      <p class="muted" id="finalScore">Je score: 0/10</p>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:10px">
+        <button id="again">Speel opnieuw</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ---------- Layout Fit ---------- */
+function layoutFit(){
+  const header = document.querySelector('header');
+  const diagram = document.getElementById('diagram');
+  const controls = document.querySelector('.controls');
+  const toprow = document.querySelector('.toprow');
+  const vh = window.innerHeight;
+  const reserved = header.offsetHeight + toprow.offsetHeight + controls.offsetHeight + 80;
+  let max = vh - reserved;
+  if(max < 220) max = 220;
+  diagram.style.height = max + 'px';
+  diagram.style.aspectRatio = 'unset';
+}
+window.addEventListener('resize', layoutFit);
+
+const TOTAL = 10;
+
+/* ---------- Audio: mp3-bestanden ---------- */
+const majorFiles = [
+  'audio/hint_major_level1.mp3',
+  'audio/hint_major_level2.mp3',
+  'audio/hint_major_level3.mp3',
+  'audio/hint_major_level4.mp3',
+  'audio/hint_major_level5.mp3'
+];
+const minorFiles = [
+  'audio/hint_minor_level1.mp3',
+  'audio/hint_minor_level2.mp3',
+  'audio/hint_minor_level3.mp3',
+  'audio/hint_minor_level4.mp3',
+  'audio/hint_minor_level5.mp3'
+];
+
+const majorClips = majorFiles.map(src => new Audio(src));
+const minorClips = minorFiles.map(src => new Audio(src));
+
+let majorIndex = 0;
+let minorIndex = 0;
+
+function nextMajorClip(){
+  const clip = majorClips[majorIndex];
+  majorIndex = (majorIndex + 1) % majorClips.length;
+  return clip;
+}
+function nextMinorClip(){
+  const clip = minorClips[minorIndex];
+  minorIndex = (minorIndex + 1) % minorClips.length;
+  return clip;
+}
+
+// optioneel – alleen gebruiken als je deze bestanden uploadt
+const rewardAudio = new Audio('audio/reward_drumfill.mp3');
+const errorAudio  = new Audio('audio/error_trombone_wah.mp3');
+
+let currentHint = null;
+function stopCurrentHint(){
+  if(currentHint){
+    currentHint.pause();
+    currentHint.currentTime = 0;
+    currentHint = null;
+  }
+}
+
+/* ---------- Speakers & rook ---------- */
+const spL = document.getElementById('spLeft');
+const spR = document.getElementById('spRight');
+const audienceEl = document.querySelector('.audience');
+const smokeEl = document.getElementById('smoke');
+
+function speakerOn(){
+  spL.classList.add('glow');
+  spR.classList.add('glow');
+}
+function speakerOff(){
+  spL.classList.remove('glow');
+  spR.classList.remove('glow');
+}
+function smokeOn(kind){
+  smokeEl.classList.remove('major','minor');
+  if(kind) smokeEl.classList.add(kind);
+  smokeEl.classList.add('on');
+}
+function smokeOff(){ smokeEl.classList.remove('on'); }
+
+function audienceApplause(){
+  if(!audienceEl) return;
+  audienceEl.classList.add('applause');
+  setTimeout(()=>audienceEl.classList.remove('applause'), 1800);
+}
+
+/* ---------- Muziek-logica ---------- */
+const HINT_LENGTH_MS = 8000; // ongeveer 8 seconden
+
+function levelFor(q){
+  // verdeel 10 vragen over niveaus 1 t/m 5
+  return Math.min(5, Math.ceil(q * 5 / TOTAL));
+}
+
+function playMajor(){
+  stopCurrentHint();
+  const clip = nextMajorClip();
+  currentHint = clip;
+  clip.currentTime = 0;
+  clip.play().catch(()=>{});
+  speakerOn();
+  smokeOn('major');
+  setTimeout(()=>{ speakerOff(); smokeOff(); }, HINT_LENGTH_MS + 200);
+  return HINT_LENGTH_MS / 1000;
+}
+function playMinor(){
+  stopCurrentHint();
+  const clip = nextMinorClip();
+  currentHint = clip;
+  clip.currentTime = 0;
+  clip.play().catch(()=>{});
+  speakerOn();
+  smokeOn('minor');
+  setTimeout(()=>{ speakerOff(); smokeOff(); }, HINT_LENGTH_MS + 200);
+  return HINT_LENGTH_MS / 1000;
+}
+function playRewardSample(){
+  if(!rewardAudio) return;
+  rewardAudio.currentTime = 0;
+  rewardAudio.play().catch(()=>{});
+}
+function playErrorSample(){
+  if(!errorAudio) return;
+  errorAudio.currentTime = 0;
+  errorAudio.play().catch(()=>{});
+}
+
+/* ---------- Game logic ---------- */
+const LABELS = ['A1','A2','A3','A4','B1','B2','B3','B4'];
+const inside = new Set(['A3','A4','B1','B2']); // binnenhoeken
+
+let questionOrder = [];
+let state = {index:0, score:0, current:null, locked:false, finished:false};
+
+/* Nieuwe volgorde: mix van binnen- en buitenhoeken */
+function buildOrder(){
+  const insideArr  = [...inside];                             // A3, A4, B1, B2
+  const outsideArr = LABELS.filter(l => !inside.has(l));      // A1, A2, B3, B4
+  const neededInside  = Math.floor(TOTAL/2);                  // 5
+  const neededOutside = TOTAL - neededInside;                 // 5
+
+  function pickRandom(source, count){
+    const result = [];
+    while(result.length < count){
+      const item = source[Math.floor(Math.random()*source.length)];
+      result.push(item);
+    }
+    return result;
+  }
+
+  const mix = [
+    ...pickRandom(insideArr,  neededInside),
+    ...pickRandom(outsideArr, neededOutside)
+  ];
+
+  // shuffle
+  for(let i = mix.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [mix[i], mix[j]] = [mix[j], mix[i]];
+  }
+  questionOrder = mix;
+}
+
+function isInside(label){ return inside.has(label); }
+
+const progressEl = document.getElementById('progress');
+for(let i=1;i<=TOTAL;i++){
+  const d=document.createElement('div');
+  d.className='dot'+(i===1?' active':''); d.id='dot'+i; progressEl.appendChild(d);
+}
+const promptEl = document.getElementById('prompt');
+const optionsEl = document.getElementById('options');
+const scoreEl = document.getElementById('score');
+const roundEl = document.getElementById('round');
+const diagEl = document.getElementById('diagram');
+const lvlEl = document.getElementById('lvl');
+
+document.getElementById('next').addEventListener('click', ()=>{
+  if(state.finished || !state.locked) return;
+  state.index++;
+  if(state.index >= TOTAL){ finish(); }
+  else{ newQuestion(); }
+});
+document.getElementById('reset').addEventListener('click', ()=>resetGame());
+document.getElementById('listen').addEventListener('click', ()=>playCurrentHint());
+document.getElementById('stopAudio').addEventListener('click', ()=>{
+  stopCurrentHint();
+  speakerOff();
+  smokeOff();
+});
+document.getElementById('again').addEventListener('click', ()=>{
+  document.getElementById('end').style.display='none';
+  resetGame();
+});
+
+function resetGame(){
+  buildOrder();
+  stopCurrentHint();
+  speakerOff();
+  smokeOff();
+  state={index:0,score:0,current:null,locked:false,finished:false};
+  scoreEl.textContent=0;
+  roundEl.textContent=1;
+  updateDots();
+  newQuestion();
+}
+
+function newQuestion(){
+  if(state.index >= TOTAL){ return finish(); }
+  state.locked=false; optionsEl.innerHTML='';
+  stopCurrentHint();
+  speakerOff();
+  smokeOff();
+
+  const label = questionOrder[state.index];
+  state.current = label;
+
+  const qNum = state.index + 1;
+  const lvl = levelFor(qNum); lvlEl.textContent = lvl;
+  promptEl.textContent = `Is ∠${label} een binnenhoek of een buitenhoek?`;
+  drawDiagram(label);
+  buildOptions();
+  roundEl.textContent = qNum;
+  updateDots();
+  layoutFit();
+}
+
+function updateDots(){
+  for(let i=0;i<TOTAL;i++){
+    const d=document.getElementById('dot'+(i+1)); d.classList.remove('active','done');
+    if(i < state.index) d.classList.add('done');
+    if(i === state.index) d.classList.add('active');
+  }
+}
+function buildOptions(){
+  const opts = [ ['Binnenhoek', true], ['Buitenhoek', false] ];
+  opts.forEach(([label, insideOpt])=>{
+    const btn = document.createElement('div');
+    btn.className='opt'; btn.textContent = label; btn.onclick=(ev)=>select(insideOpt, ev);
+    optionsEl.appendChild(btn);
+  });
+}
+
+function select(chosenInside, ev){
+  if(state.locked || state.finished) return;
+  state.locked=true;
+
+  const correctInside = isInside(state.current);
+  const nodes=[...document.querySelectorAll('.opt')];
+  nodes.forEach(n=>{
+    const isBin = n.textContent.includes('Binnen');
+    const ok = (isBin===correctInside);
+    n.classList.toggle('correct', ok);
+    if(isBin!==correctInside && n===ev.currentTarget) n.classList.add('wrong');
+  });
+
+  if(chosenInside===correctInside){
+    state.score++;
+    scoreEl.textContent = state.score;
+    playRewardSample();
+    audienceApplause();
+  } else {
+    playErrorSample();
+  }
+
+  // als dit de laatste vraag was, toon automatisch het "Level completed" scherm
+  if(state.index === TOTAL - 1){
+    setTimeout(()=>finish(), 900);
+  }
+}
+
+function playHintForCurrent(){
+  if(!state.current) return 0;
+  return isInside(state.current) ? playMajor() : playMinor();
+}
+function playCurrentHint(){
+  const dur = playHintForCurrent();
+  return dur;
+}
+
+/* ---------- Diagram: lijnen + oplichtende hoek ---------- */
+function drawDiagram(highlight){
+  const marks = {
+    A1:{x:260,y:105}, A2:{x:350,y:105}, A3:{x:260,y:185}, A4:{x:350,y:185},
+    B1:{x:490,y:315}, B2:{x:570,y:315}, B3:{x:490,y:385}, B4:{x:570,y:385}
+  };
+
+  const markStr = Object.entries(marks).map(([key,p])=>{
+    const hi = key===highlight; const col = hi? '#ffb0f0' : '#f8f1ff'; const bg = hi? ' filter="url(#glow)"' : '';
+    return `
+      <g ${bg}>
+        <circle cx="${p.x}" cy="${p.y}" r="22" fill="rgba(255,176,240,${hi?0.28:0.06})" stroke="${col}" stroke-width="${hi?3:2}" />
+        <text x="${p.x}" y="${p.y+6}" text-anchor="middle" fill="${col}" font-size="16" font-weight="800">${key}</text>
+      </g>`;
+  }).join('');
+
+  diagEl.innerHTML = `
+  <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="glow">
+        <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#ff52d9" flood-opacity="0.9"/>
+      </filter>
+    </defs>
+    <g stroke="#f0dbff" stroke-width="3" opacity="0.9">
+      <line x1="40" y1="140" x2="760" y2="140" />
+      <line x1="40" y1="360" x2="760" y2="360" />
+      <line x1="180" y1="0" x2="640" y2="500" />
+    </g>
+    <g fill="#d7c8ef" font-size="18" font-weight="800">
+      <text x="270" y="130">A</text><text x="530" y="380">B</text>
+    </g>
+    ${markStr}
+  </svg>`;
+
+  const pos = marks[highlight];
+  if(pos){
+    const pulse = document.createElement('div'); pulse.className='pulse';
+    pulse.style.left=pos.x+'px'; pulse.style.top=pos.y+'px';
+    diagEl.appendChild(pulse); setTimeout(()=>pulse.remove(),1400);
+  }
+}
+
+function finish(){
+  if(state.finished) return;
+  state.finished = true;
+  stopCurrentHint();
+  speakerOff();
+  smokeOff();
+  document.getElementById('finalScore').textContent = `Je score: ${state.score}/${TOTAL}`;
+  document.getElementById('end').style.display = 'flex';
+}
+
+/* Start */
+layoutFit();
+resetGame();
+</script>
+</body>
+</html>
 
