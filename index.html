@@ -525,18 +525,24 @@ function buildOptions(){
 
 function select(chosenInside, ev){
   if(state.locked || state.finished) return;
-  state.locked=true;
+  state.locked = true;
+
+  // ⏹️ stop meteen de hint-muziek + effecten
+  stopCurrentHint();
+  speakerOff();
+  smokeOff();
 
   const correctInside = isInside(state.current);
-  const nodes=[...document.querySelectorAll('.opt')];
+  const nodes = [...document.querySelectorAll('.opt')];
+
   nodes.forEach(n=>{
     const isBin = n.textContent.includes('Binnen');
-    const ok = (isBin===correctInside);
+    const ok = (isBin === correctInside);
     n.classList.toggle('correct', ok);
-    if(isBin!==correctInside && n===ev.currentTarget) n.classList.add('wrong');
+    if(isBin !== correctInside && n === ev.currentTarget) n.classList.add('wrong');
   });
 
-  if(chosenInside===correctInside){
+  if(chosenInside === correctInside){
     state.score++;
     scoreEl.textContent = state.score;
     playRewardSample();
@@ -550,6 +556,7 @@ function select(chosenInside, ev){
     setTimeout(()=>finish(), 900);
   }
 }
+
 
 function playHintForCurrent(){
   if(!state.current) return 0;
