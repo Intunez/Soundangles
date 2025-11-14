@@ -326,17 +326,22 @@ function nextMinorClip(){
   return clip;
 }
 
-// optioneel – alleen gebruiken als je deze bestanden uploadt
+// goed/fout-geluiden
 const rewardAudio = new Audio('audio/reward_drumfill.mp3');
 const errorAudio  = new Audio('audio/error_trombone_wah.mp3');
 
 let currentHint = null;
+
+// alles wat met hints te maken heeft stilleggen
 function stopCurrentHint(){
   if(currentHint){
     currentHint.pause();
     currentHint.currentTime = 0;
     currentHint = null;
   }
+  // extra veilig: alle mogelijke hint-clips stoppen
+  majorClips.forEach(a => { a.pause(); a.currentTime = 0; });
+  minorClips.forEach(a => { a.pause(); a.currentTime = 0; });
 }
 
 /* ---------- Speakers & rook ---------- */
@@ -397,12 +402,10 @@ function playMinor(){
   return HINT_LENGTH_MS / 1000;
 }
 function playRewardSample(){
-  if(!rewardAudio) return;
   rewardAudio.currentTime = 0;
   rewardAudio.play().catch(()=>{});
 }
 function playErrorSample(){
-  if(!errorAudio) return;
   errorAudio.currentTime = 0;
   errorAudio.play().catch(()=>{});
 }
@@ -525,24 +528,23 @@ function buildOptions(){
 
 function select(chosenInside, ev){
   if(state.locked || state.finished) return;
-  state.locked = true;
+  state.locked=true;
 
-  // ⏹️ stop meteen de hint-muziek + effecten
+  // muziek en effecten meteen stoppen bij antwoord
   stopCurrentHint();
   speakerOff();
   smokeOff();
 
   const correctInside = isInside(state.current);
-  const nodes = [...document.querySelectorAll('.opt')];
-
+  const nodes=[...document.querySelectorAll('.opt')];
   nodes.forEach(n=>{
     const isBin = n.textContent.includes('Binnen');
-    const ok = (isBin === correctInside);
+    const ok = (isBin===correctInside);
     n.classList.toggle('correct', ok);
-    if(isBin !== correctInside && n === ev.currentTarget) n.classList.add('wrong');
+    if(isBin!==correctInside && n===ev.currentTarget) n.classList.add('wrong');
   });
 
-  if(chosenInside === correctInside){
+  if(chosenInside===correctInside){
     state.score++;
     scoreEl.textContent = state.score;
     playRewardSample();
@@ -551,27 +553,31 @@ function select(chosenInside, ev){
     playErrorSample();
   }
 
-  // als dit de laatste vraag was, toon automatisch het "Level completed" scherm
+  // laatste vraag → automatisch "Level completed"
   if(state.index === TOTAL - 1){
     setTimeout(()=>finish(), 900);
   }
 }
-
 
 function playHintForCurrent(){
   if(!state.current) return 0;
   return isInside(state.current) ? playMajor() : playMinor();
 }
 function playCurrentHint(){
-  const dur = playHintForCurrent();
-  return dur;
+  return playHintForCurrent();
 }
 
 /* ---------- Diagram: lijnen + oplichtende hoek ---------- */
 function drawDiagram(highlight){
   const marks = {
-    A1:{x:240,y:105}, A2:{x:330,y:155}, A3:{x:290,y:85}, A4:{x:370,y:165},
-    B1:{x:290,y:265}, B2:{x:540,y:315}, B3:{x:490,y:385}, B4:{x:570,y:385}
+    A1:{x:240,y:105},
+    A2:{x:330,y:155},
+    A3:{x:290,y:85},
+    A4:{x:360,y:175},   // iets verplaatst zodat hij netter ligt
+    B1:{x:290,y:265},
+    B2:{x:510,y:315},   // iets meer naar links
+    B3:{x:490,y:385},
+    B4:{x:570,y:385}
   };
 
   const markStr = Object.entries(marks).map(([key,p])=>{
@@ -625,4 +631,3 @@ resetGame();
 </script>
 </body>
 </html>
-
