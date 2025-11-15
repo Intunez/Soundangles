@@ -15,6 +15,15 @@
       box-sizing: border-box;
     }
 
+    #startButton {
+      margin-bottom: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
     #scene {
       position: relative;
       width: 700px;
@@ -89,6 +98,8 @@
 
 <body>
 
+<button id="startButton">Klik om de intro te starten</button>
+
 <!-- Jouw mp3 in de audio-map -->
 <audio id="muziek" src="audio/VerwisBinnen_slide_majeur.mp3"></audio>
 
@@ -106,6 +117,7 @@
   const audio = document.getElementById("muziek");
   const mannetje = document.getElementById("mannetje");
   const scene = document.getElementById("scene");
+  const startButton = document.getElementById("startButton");
 
   const TOTAL_DURATION = 29; // jouw mp3 duurt 29 sec
 
@@ -157,25 +169,36 @@
 
     setMannetjePosition(x, y);
 
-    if (!audio.ended) requestAnimationFrame(animate);
+    if (!audio.ended && !audio.paused) {
+      requestAnimationFrame(animate);
+    }
   }
 
-  // Animatie starten
-  audio.addEventListener("play", () => requestAnimationFrame(animate));
+  // ⭐ Startknop: audio + animatie starten
+  startButton.addEventListener("click", () => {
+    const s = scene.getBoundingClientRect();
+    setMannetjePosition(positions[0].x * s.width, positions[0].y * s.height);
+
+    audio.play().then(() => {
+      startButton.style.display = "none";
+      requestAnimationFrame(animate);
+    }).catch((err) => {
+      alert("De audio kon niet starten. Probeer de pagina te herladen.");
+      console.error(err);
+    });
+  });
 
   // ⭐⭐⭐ Automatisch naar home.html na de audio ⭐⭐⭐
   audio.addEventListener("ended", () => {
     window.location.href = "home.html";
   });
 
-  // Startpositie instellen en muziek automatisch starten
-  window.onload = () => {
+  // Startpositie instellen (zonder audio te starten)
+  window.addEventListener("load", () => {
     const s = scene.getBoundingClientRect();
     setMannetjePosition(positions[0].x * s.width, positions[0].y * s.height);
-    audio.play();
-  };
+  });
 </script>
 
 </body>
 </html>
-
