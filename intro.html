@@ -100,10 +100,8 @@
 
 <button id="startButton">Klik om de intro te starten</button>
 
-<!-- Jouw mp3 in de audio-map -->
 <audio id="muziek" src="audio/VerwisBinnen_slide_majeur.mp3"></audio>
 
-<!-- Slide-animatie veld -->
 <div id="scene">
   <img src="hoeken.png" alt="Hoeken achtergrond">
   <div id="mannetje">
@@ -119,9 +117,8 @@
   const scene = document.getElementById("scene");
   const startButton = document.getElementById("startButton");
 
-  const TOTAL_DURATION = 29; // jouw mp3 duurt 29 sec
+  const TOTAL_DURATION = 29;
 
-  // Posities van jouw acht hoeken
   const positions = [
     { x: 0.30, y: 0.30 },
     { x: 0.44, y: 0.27 },
@@ -133,7 +130,6 @@
     { x: 0.48, y: 0.75 }
   ];
 
-  // Tijdstippen verdelen over 29 seconden
   const keyframes = [];
   for (let i = 0; i < positions.length; i++) {
     const t = (TOTAL_DURATION * i) / (positions.length - 1);
@@ -151,7 +147,6 @@
     let k1 = keyframes[0];
     let k2 = keyframes[keyframes.length - 1];
 
-    // Zoek juiste twee keyframes
     for (let i = 0; i < keyframes.length - 1; i++) {
       if (current >= keyframes[i].t && current <= keyframes[i + 1].t) {
         k1 = keyframes[i];
@@ -161,9 +156,7 @@
     }
 
     const local = (current - k1.t) / (k2.t - k1.t);
-
     const s = scene.getBoundingClientRect();
-
     const x = (k1.x + (k2.x - k1.x) * local) * s.width;
     const y = (k1.y + (k2.y - k1.y) * local) * s.height;
 
@@ -174,7 +167,6 @@
     }
   }
 
-  // ⭐ Startknop: audio + animatie starten
   startButton.addEventListener("click", () => {
     const s = scene.getBoundingClientRect();
     setMannetjePosition(positions[0].x * s.width, positions[0].y * s.height);
@@ -188,12 +180,10 @@
     });
   });
 
-  // ⭐⭐⭐ Automatisch naar home.html na de audio ⭐⭐⭐
   audio.addEventListener("ended", () => {
     window.location.href = "home.html";
   });
 
-  // Startpositie instellen (zonder audio te starten)
   window.addEventListener("load", () => {
     const s = scene.getBoundingClientRect();
     setMannetjePosition(positions[0].x * s.width, positions[0].y * s.height);
