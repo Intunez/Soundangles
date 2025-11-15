@@ -1,1 +1,185 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Soundangles — Startscherm</title>
+
+  <style>
+    :root{
+      --bg1:#1a0b2e; --bg2:#3b0b4e; --panel:#1d1233; --ink:#f8f1ff; --muted:#d7c8ef;
+      --accent:#ff52d9; --accent2:#a855f7; --good:#22c55e; --bad:#ef4444;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:"Nunito",system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif;
+      color:var(--ink);
+      background:radial-gradient(1400px 800px at 70% -10%, var(--bg2) 0%, var(--bg1) 60%);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+    }
+
+    .wrap{
+      max-width:980px;
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+    }
+
+    header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    h1{
+      margin:0;
+      font-size:clamp(26px,3.2vw,34px);
+      letter-spacing:.06em;
+    }
+    .subtitle{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .levels{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:16px;
+    }
+
+    .card{
+      background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02));
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 16px 40px rgba(0,0,0,.45);
+      padding:18px 18px 16px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .card-title{
+      margin:0;
+      font-size:20px;
+    }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:999px;
+      padding:4px 10px;
+      font-size:12px;
+      background:rgba(0,0,0,.28);
+      border:1px solid rgba(255,255,255,.18);
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+    .list{
+      margin:4px 0 0 0;
+      padding-left:18px;
+      font-size:14px;
+      color:var(--muted);
+    }
+    .list li{margin:2px 0}
+
+    button{
+      appearance:none;
+      border:none;
+      border-radius:16px;
+      padding:10px 16px;
+      font-weight:900;
+      cursor:pointer;
+      background:linear-gradient(180deg,var(--accent),var(--accent2));
+      color:#160824;
+      font-size:16px;
+      align-self:flex-start;
+      margin-top:6px;
+      box-shadow:0 10px 25px rgba(0,0,0,.45);
+      transition:.15s transform ease,.2s filter ease;
+      text-decoration:none;
+    }
+    button:hover{filter:brightness(1.06)}
+    button:active{transform:translateY(1px)}
+
+    .btn-secondary{
+      background:linear-gradient(180deg,#22c55e,#16a34a);
+    }
+
+    a.btn-link{
+      text-decoration:none;
+      color:inherit;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+
+    footer{
+      text-align:right;
+      font-size:12px;
+      color:var(--muted);
+      margin-top:4px;
+    }
+
+    @media (max-width:600px){
+      header{align-items:flex-start}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Soundangles</h1>
+        <p class="subtitle">Kies een level en luister naar de muziek om de juiste hoeken te vinden.</p>
+      </div>
+    </header>
+
+    <section class="levels">
+      <!-- LEVEL 1 -->
+      <article class="card">
+        <div class="badge">Level 1</div>
+        <h2 class="card-title">Binnen- of buitenhoek?</h2>
+        <p class="subtitle" style="margin-top:2px">
+          Is het een <strong>binnenhoek</strong> of een <strong>buitenhoek</strong>?<br>
+          Luister naar de muzikale hint en kies de juiste soort hoek.
+        </p>
+        <button class="btn-secondary">
+          <a class="btn-link" href="index.html">Speel Level 1</a>
+        </button>
+      </article>
+
+      <!-- LEVEL 2 -->
+      <article class="card">
+        <div class="badge">Level 2</div>
+        <h2 class="card-title">Soorten hoeken met muziek</h2>
+        <p class="subtitle" style="margin-top:2px">
+          Herken met behulp van muziek welke soort hoeken je ziet.
+        </p>
+        <ul class="list">
+          <li>overeenkomstige hoeken</li>
+          <li>verwisselende binnenhoeken</li>
+          <li>verwisselende buitenhoeken</li>
+          <li>binnenhoeken aan dezelfde kant van de snijlijn</li>
+          <li>buitenhoeken aan dezelfde kant van de snijlijn</li>
+        </ul>
+        <button>
+          <a class="btn-link" href="level2.html">Speel Level 2</a>
+        </button>
+      </article>
+    </section>
+
+    <footer>
+      Tip: gebruik <code>home.html</code> als startpagina voor de leerlingen.
+    </footer>
+  </div>
+</body>
+</html>
 
