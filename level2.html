@@ -361,21 +361,17 @@ A1,A2,A3,A4,B1,B2,B3,B4
 const QUESTIONS = [
   // overeenkomstig
   {a:'A1', b:'B1', type:'corresponding'},
-  {a:'A2', b:'B2', type:'corresponding'},
-  {a:'A3', b:'B3', type:'corresponding'},
+  {a:'A2', b:'B2', type:'altInterior'},
+  {a:'A3', b:'B3', type:'altExterior'},
   {a:'A4', b:'B4', type:'corresponding'},
-  // verwisselende binnen
-  {a:'A4', b:'B2', type:'altInterior'},
-  {a:'A3', b:'B1', type:'altInterior'},
-  // binnen zelfde kant
-  {a:'A4', b:'B1', type:'sameInterior'},
-  {a:'A3', b:'B2', type:'sameInterior'},
-  // verwisselende buiten
-  {a:'A1', b:'B3', type:'altExterior'},
-  {a:'A2', b:'B4', type:'altExterior'},
-  // buiten zelfde kant
-  {a:'A1', b:'B4', type:'sameExterior'},
-  {a:'A2', b:'B3', type:'sameExterior'},
+  {a:'A4', b:'B2', type:'sameInterior'},
+  {a:'A3', b:'B4', type:'sameExterior'},
+  {a:'A4', b:'B1', type:'altInterior'},
+  {a:'A3', b:'B2', type:'corresponding'},
+  {a:'A1', b:'B3', type:'sameExterior'},
+  {a:'A2', b:'B1', type:'sameInterior'},
+  {a:'A1', b:'B4', type:'altExterior'},
+  {a:'A2', b:'B3', type:'corresponding'},
 ];
 
 const TOTAL = QUESTIONS.length;
