@@ -1,1 +1,181 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>Slide Intro</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    #scene {
+      position: relative;
+      width: 700px;
+      max-width: 95vw;
+      aspect-ratio: 441 / 311;
+      background: #d6e47a;
+      overflow: hidden;
+    }
+
+    #scene img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+
+    #mannetje {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      transform: translate(-50%, -50%);
+    }
+
+    #mannetje .hoofd {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #ffd966;
+      border: 2px solid #555;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    #mannetje .hoofd::before,
+    #mannetje .hoofd::after {
+      content: "";
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #333;
+      top: 7px;
+    }
+
+    #mannetje .hoofd::before { left: 6px; }
+    #mannetje .hoofd::after  { right: 6px; }
+
+    #mannetje .lichaam {
+      width: 4px;
+      height: 14px;
+      background: #333;
+      margin: 0 auto;
+    }
+
+    #mannetje .benen {
+      width: 20px;
+      height: 12px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    #mannetje .benen span {
+      width: 4px;
+      height: 12px;
+      background: #333;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- Jouw mp3 in de audio-map -->
+<audio id="muziek" src="audio/VerwisBinnen_slide_majeur.mp3"></audio>
+
+<!-- Slide-animatie veld -->
+<div id="scene">
+  <img src="hoeken.png" alt="Hoeken achtergrond">
+  <div id="mannetje">
+    <div class="hoofd"></div>
+    <div class="lichaam"></div>
+    <div class="benen"><span></span><span></span></div>
+  </div>
+</div>
+
+<script>
+  const audio = document.getElementById("muziek");
+  const mannetje = document.getElementById("mannetje");
+  const scene = document.getElementById("scene");
+
+  const TOTAL_DURATION = 29; // jouw mp3 duurt 29 sec
+
+  // Posities van jouw acht hoeken
+  const positions = [
+    { x: 0.30, y: 0.30 },
+    { x: 0.44, y: 0.27 },
+    { x: 0.47, y: 0.40 },
+    { x: 0.33, y: 0.43 },
+    { x: 0.45, y: 0.60 },
+    { x: 0.60, y: 0.57 },
+    { x: 0.64, y: 0.72 },
+    { x: 0.48, y: 0.75 }
+  ];
+
+  // Tijdstippen verdelen over 29 seconden
+  const keyframes = [];
+  for (let i = 0; i < positions.length; i++) {
+    const t = (TOTAL_DURATION * i) / (positions.length - 1);
+    keyframes.push({ t, ...positions[i] });
+  }
+
+  function setMannetjePosition(px, py) {
+    mannetje.style.left = px + "px";
+    mannetje.style.top = py + "px";
+  }
+
+  function animate() {
+    const current = audio.currentTime;
+
+    let k1 = keyframes[0];
+    let k2 = keyframes[keyframes.length - 1];
+
+    // Zoek juiste twee keyframes
+    for (let i = 0; i < keyframes.length - 1; i++) {
+      if (current >= keyframes[i].t && current <= keyframes[i + 1].t) {
+        k1 = keyframes[i];
+        k2 = keyframes[i + 1];
+        break;
+      }
+    }
+
+    const local = (current - k1.t) / (k2.t - k1.t);
+
+    const s = scene.getBoundingClientRect();
+
+    const x = (k1.x + (k2.x - k1.x) * local) * s.width;
+    const y = (k1.y + (k2.y - k1.y) * local) * s.height;
+
+    setMannetjePosition(x, y);
+
+    if (!audio.ended) requestAnimationFrame(animate);
+  }
+
+  // Animatie starten
+  audio.addEventListener("play", () => requestAnimationFrame(animate));
+
+  // ⭐⭐⭐ Automatisch naar home.html na de audio ⭐⭐⭐
+  audio.addEventListener("ended", () => {
+    window.location.href = "home.html";
+  });
+
+  // Startpositie instellen en muziek automatisch starten
+  window.onload = () => {
+    const s = scene.getBoundingClientRect();
+    setMannetjePosition(positions[0].x * s.width, positions[0].y * s.height);
+    audio.play();
+  };
+</script>
+
+</body>
+</html>
 
