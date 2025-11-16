@@ -117,46 +117,31 @@
       filter: drop-shadow(0 0 6px rgba(0,0,0,0.4));
     }
 
-    /* Hoek-labels ----------------------------------------------------- */
+    /* Pijl die naar de hoek wijst ------------------------------------- */
 
-    .angle-label {
+    .marker-arrow {
       position: absolute;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: 2px solid #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      opacity: 0.7;
+      width: 0;
+      height: 0;
+      border-left: 14px solid transparent;
+      border-right: 14px solid transparent;
+      border-bottom: 26px solid #ff4fd6;
+      filter: drop-shadow(0 0 10px rgba(255,79,214,0.8));
+      opacity: 0.95;
       transition: 0.2s;
-      background: rgba(0,0,0,0.15);
-      backdrop-filter: blur(2px);
     }
 
-    .angle-label span {
-      pointer-events: none;
-    }
+    /* Posities voor de pijl – tip ongeveer bij de boogjes.
+       Deze kun je zelf nog fijn bijregelen.                        */
+    .arrow-A1 { top: 40%; left: 48%; }
+    .arrow-A2 { top: 26%; left: 59%; }
+    .arrow-A3 { top: 43%; left: 62%; }
+    .arrow-A4 { top: 52%; left: 52%; }
 
-    .angle-label.active {
-      border-color: #ff4fd6;
-      box-shadow: 0 0 16px #ff4fd6;
-      background: rgba(255,79,214,0.35);
-      opacity: 1;
-      transform: scale(1.08);
-    }
-
-    /* Posities – eventueel nog fijn bijregelen ------------------------ */
-    .A1 { top: 33%; left: 36%; }
-    .A2 { top: 22%; left: 48%; }
-    .A3 { top: 38%; left: 54%; }
-    .A4 { top: 45%; left: 43%; }
-
-    .B1 { top: 59%; left: 60%; }
-    .B2 { top: 66%; left: 66%; }
-    .B3 { top: 74%; left: 60%; }
-    .B4 { top: 81%; left: 53%; }
+    .arrow-B1 { top: 62%; left: 64%; }
+    .arrow-B2 { top: 68%; left: 71%; }
+    .arrow-B3 { top: 77%; left: 66%; }
+    .arrow-B4 { top: 83%; left: 58%; }
 
     /* Onderste balk --------------------------------------------------- */
 
@@ -242,16 +227,8 @@
           <!-- JOUW FIGUUR -->
           <img src="images/juistefiguur.jpeg" alt="Hoekenfiguur" class="diagram-image">
 
-          <!-- Hoeken A1–A4, B1–B4 -->
-          <div class="angle-label A1" data-angle="A1"><span>A1</span></div>
-          <div class="angle-label A2" data-angle="A2"><span>A2</span></div>
-          <div class="angle-label A3" data-angle="A3"><span>A3</span></div>
-          <div class="angle-label A4" data-angle="A4"><span>A4</span></div>
-
-          <div class="angle-label B1" data-angle="B1"><span>B1</span></div>
-          <div class="angle-label B2" data-angle="B2"><span>B2</span></div>
-          <div class="angle-label B3" data-angle="B3"><span>B3</span></div>
-          <div class="angle-label B4" data-angle="B4"><span>B4</span></div>
+          <!-- Eén pijl die verplaatst wordt per vraag -->
+          <div class="marker-arrow" id="markerArrow"></div>
         </div>
       </div>
     </div>
@@ -315,8 +292,7 @@
      VRAGEN
      ======================= */
 
-  // Binnenhoeken: tussen de twee evenwijdige lijnen
-  // In jouw figuur zijn dat A3, A4, B1, B2
+  // Binnenhoeken: tussen de evenwijdige lijnen (A3, A4, B1, B2)
   const questions = [
     { angle: "A1", correct: "buiten" },
     { angle: "A2", correct: "buiten" },
@@ -334,7 +310,6 @@
   let score = 0;
   let answered = false;
 
-  const angleLabels = document.querySelectorAll(".angle-label");
   const questionText = document.getElementById("questionText");
   const progressText = document.getElementById("progressText");
   const scoreText = document.getElementById("scoreText");
@@ -345,6 +320,12 @@
   const btnBuiten = document.getElementById("btnBuiten");
   const listenBtn = document.getElementById("listenBtn");
   const stopMusicBtn = document.getElementById("stopMusicBtn");
+  const markerArrow = document.getElementById("markerArrow");
+
+  function updateArrow(angleName) {
+    // reset class en zet juiste positieklasse
+    markerArrow.className = "marker-arrow arrow-" + angleName;
+  }
 
   function showQuestion(index) {
     const q = questions[index];
@@ -362,16 +343,11 @@
     progressText.textContent = "Vraag " + (index + 1) + " / " + questions.length;
     scoreText.textContent = "Score: " + score;
 
-    // highlight juiste hoek
-    angleLabels.forEach(label => {
-      if (label.dataset.angle === q.angle) {
-        label.classList.add("active");
-      } else {
-        label.classList.remove("active");
-      }
-    });
+    // pijl verplaatsen
+    updateArrow(q.angle);
 
-    stopAllHints();
+    // muziek voor de nieuwe vraag AUTOMATISCH starten
+    playRandomHint(q.correct);
   }
 
   function handleAnswer(answer) {
@@ -380,6 +356,9 @@
 
     const q = questions[currentIndex];
     const correct = q.correct;
+
+    // muziek stoppen bij antwoord
+    stopAllHints();
 
     if (answer === correct) {
       score++;
@@ -398,9 +377,6 @@
         btnBuiten.classList.add("wrong");
       }
     }
-
-    // speel juiste hint
-    playRandomHint(correct);
 
     scoreText.textContent = "Score: " + score;
     if (currentIndex < questions.length - 1) {
@@ -429,7 +405,7 @@
 
   listenBtn.addEventListener("click", () => {
     const q = questions[currentIndex];
-    playRandomHint(q.correct); // juiste soort hint
+    playRandomHint(q.correct);
   });
 
   stopMusicBtn.addEventListener("click", () => {
