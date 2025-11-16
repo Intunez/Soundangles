@@ -255,36 +255,35 @@
      AUDIO
      ======================= */
 
-  const binnenAudios = [
-    new Audio("audio/hint_major_level1.mp3"),
-    new Audio("audio/hint_major_level2.mp3"),
-    new Audio("audio/hint_major_level3.mp3"),
-    new Audio("audio/hint_major_level4.mp3")
+  const binnenSources = [
+    "audio/hint_major_level1.mp3",
+    "audio/hint_major_level2.mp3",
+    "audio/hint_major_level3.mp3",
+    "audio/hint_major_level4.mp3"
   ];
 
-  const buitenAudios = [
-    new Audio("audio/hint_minor_level1.mp3"),
-    new Audio("audio/hint_minor_level2.mp3"),
-    new Audio("audio/hint_minor_level3.mp3"),
-    new Audio("audio/hint_minor_level4.mp3")
+  const buitenSources = [
+    "audio/hint_minor_level1.mp3",
+    "audio/hint_minor_level2.mp3",
+    "audio/hint_minor_level3.mp3",
+    "audio/hint_minor_level4.mp3"
   ];
 
   let currentHint = null;
 
-  function stopAllHints() {
-    [...binnenAudios, ...buitenAudios].forEach(a => {
-      a.pause();
-      a.currentTime = 0;
-    });
-    currentHint = null;
+  function stopCurrentHint() {
+    if (currentHint) {
+      currentHint.pause();
+      currentHint.currentTime = 0;
+      currentHint = null;
+    }
   }
 
   function playRandomHint(type) {
-    stopAllHints();
-    const list = type === "binnen" ? binnenAudios : buitenAudios;
+    stopCurrentHint(); // eerst alles uit
+    const list = type === "binnen" ? binnenSources : buitenSources;
     const index = Math.floor(Math.random() * list.length);
-    currentHint = list[index];
-    currentHint.currentTime = 0;
+    currentHint = new Audio(list[index]);
     currentHint.play();
   }
 
@@ -292,7 +291,7 @@
      VRAGEN
      ======================= */
 
-  // Binnenhoeken: tussen de evenwijdige lijnen (A3, A4, B1, B2)
+  // Binnenhoeken: A3, A4, B1, B2
   const questions = [
     { angle: "A1", correct: "buiten" },
     { angle: "A2", correct: "buiten" },
@@ -323,7 +322,6 @@
   const markerArrow = document.getElementById("markerArrow");
 
   function updateArrow(angleName) {
-    // reset class en zet juiste positieklasse
     markerArrow.className = "marker-arrow arrow-" + angleName;
   }
 
@@ -346,7 +344,7 @@
     // pijl verplaatsen
     updateArrow(q.angle);
 
-    // muziek voor de nieuwe vraag AUTOMATISCH starten
+    // muziek voor nieuwe vraag automatisch
     playRandomHint(q.correct);
   }
 
@@ -357,8 +355,8 @@
     const q = questions[currentIndex];
     const correct = q.correct;
 
-    // muziek stoppen bij antwoord
-    stopAllHints();
+    // muziek STOPPEN bij antwoord
+    stopCurrentHint();
 
     if (answer === correct) {
       score++;
@@ -400,6 +398,7 @@
   restartBtn.addEventListener("click", () => {
     currentIndex = 0;
     score = 0;
+    stopCurrentHint();
     showQuestion(currentIndex);
   });
 
@@ -409,11 +408,12 @@
   });
 
   stopMusicBtn.addEventListener("click", () => {
-    stopAllHints();
+    stopCurrentHint();
   });
 
   // Start spel
   showQuestion(currentIndex);
 </script>
+
 </body>
 </html>
