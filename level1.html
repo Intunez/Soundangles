@@ -67,7 +67,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin: 8px 0 14px;
+      margin: 8px 0 10px;
       font-size: 14px;
       opacity: 0.9;
     }
@@ -76,7 +76,24 @@
       margin-right: 16px;
     }
 
-    /* SPEELVELD ------------------------------------------------------- */
+    /* Tekst van de te benoemen hoek ------------------------------ */
+
+    .angle-name-container {
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    .angle-name-label {
+      opacity: 0.8;
+      margin-right: 6px;
+    }
+
+    .angle-name-value {
+      font-weight: 700;
+      font-size: 22px;
+    }
+
+    /* SPEELVELD -------------------------------------------------- */
 
     .board-wrapper {
       background: radial-gradient(circle at top left, #742c9b, #1b0227);
@@ -117,33 +134,7 @@
       filter: drop-shadow(0 0 6px rgba(0,0,0,0.4));
     }
 
-    /* Pijl die naar de hoek wijst ------------------------------------- */
-
-    .marker-arrow {
-      position: absolute;
-      width: 0;
-      height: 0;
-      border-left: 14px solid transparent;
-      border-right: 14px solid transparent;
-      border-bottom: 26px solid #ff4fd6;
-      filter: drop-shadow(0 0 10px rgba(255,79,214,0.8));
-      opacity: 0.95;
-      transition: 0.2s;
-    }
-
-    /* Posities voor de pijl – tip ongeveer bij de boogjes.
-       Deze kun je zelf nog fijn bijregelen.                        */
-    .arrow-A1 { top: 40%; left: 48%; }
-    .arrow-A2 { top: 26%; left: 59%; }
-    .arrow-A3 { top: 43%; left: 62%; }
-    .arrow-A4 { top: 52%; left: 52%; }
-
-    .arrow-B1 { top: 62%; left: 64%; }
-    .arrow-B2 { top: 68%; left: 71%; }
-    .arrow-B3 { top: 77%; left: 66%; }
-    .arrow-B4 { top: 83%; left: 58%; }
-
-    /* Onderste balk --------------------------------------------------- */
+    /* Onderste balk ---------------------------------------------- */
 
     .bottom-panel {
       margin-top: 18px;
@@ -206,7 +197,7 @@
     <div>
       <h1>LEVEL 1 — Binnen of buitenhoek</h1>
       <div class="small" id="questionText">
-        Is ∠A1 een binnenhoek of een buitenhoek?
+        Is de opgelichte hoek een binnenhoek of een buitenhoek?
       </div>
     </div>
     <button class="btn btn-primary" id="restartBtn">Herstart</button>
@@ -220,15 +211,18 @@
     <button class="btn btn-primary" id="nextBtn" disabled>Volgende vraag</button>
   </div>
 
+  <!-- VASTE PLAATS VOOR TE BENOEMEN HOEK -->
+  <div class="angle-name-container">
+    <span class="angle-name-label">Te benoemen hoek:</span>
+    <span class="angle-name-value" id="angleNameText">∠A1</span>
+  </div>
+
   <div class="board-wrapper">
     <div class="board">
       <div class="diagram">
         <div class="diagram-inner">
-          <!-- JOUW FIGUUR -->
+          <!-- Jouw figuur -->
           <img src="images/juistefiguur.jpeg" alt="Hoekenfiguur" class="diagram-image">
-
-          <!-- Eén pijl die verplaatst wordt per vraag -->
-          <div class="marker-arrow" id="markerArrow"></div>
         </div>
       </div>
     </div>
@@ -280,7 +274,7 @@
   }
 
   function playRandomHint(type) {
-    stopCurrentHint(); // eerst alles uit
+    stopCurrentHint();
     const list = type === "binnen" ? binnenSources : buitenSources;
     const index = Math.floor(Math.random() * list.length);
     currentHint = new Audio(list[index]);
@@ -319,11 +313,7 @@
   const btnBuiten = document.getElementById("btnBuiten");
   const listenBtn = document.getElementById("listenBtn");
   const stopMusicBtn = document.getElementById("stopMusicBtn");
-  const markerArrow = document.getElementById("markerArrow");
-
-  function updateArrow(angleName) {
-    markerArrow.className = "marker-arrow arrow-" + angleName;
-  }
+  const angleNameText = document.getElementById("angleNameText");
 
   function showQuestion(index) {
     const q = questions[index];
@@ -338,11 +328,9 @@
     // tekst
     questionText.textContent =
       "Is ∠" + q.angle + " een binnenhoek of een buitenhoek?";
+    angleNameText.textContent = "∠" + q.angle;
     progressText.textContent = "Vraag " + (index + 1) + " / " + questions.length;
     scoreText.textContent = "Score: " + score;
-
-    // pijl verplaatsen
-    updateArrow(q.angle);
 
     // muziek voor nieuwe vraag automatisch
     playRandomHint(q.correct);
@@ -355,7 +343,7 @@
     const q = questions[currentIndex];
     const correct = q.correct;
 
-    // muziek STOPPEN bij antwoord
+    // muziek stoppen bij antwoord
     stopCurrentHint();
 
     if (answer === correct) {
@@ -414,6 +402,5 @@
   // Start spel
   showQuestion(currentIndex);
 </script>
-
 </body>
 </html>
