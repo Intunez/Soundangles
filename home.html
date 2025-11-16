@@ -1,211 +1,57 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Soundangles – Startscherm</title>
-
+  <meta charset="UTF-8">
+  <title>Soundangles – Home</title>
   <style>
-    :root{
-      --bg1:#050016;
-      --bg2:#1b0630;
-      --panel:#1a102b;
-      --ink:#f8f1ff;
-      --muted:#c4b5fd;
-      --accent:#22c55e;
-      --accent2:#a855f7;
-      --accentPink:#ec4899;
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f2f2f2;
+      font-family: Arial, sans-serif;
+      text-align: center;
     }
 
-    *{box-sizing:border-box;margin:0;padding:0}
-
-    body{
-      min-height:100vh;
-      font-family:"Nunito",system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif;
-      color:var(--ink);
-      background:
-        radial-gradient(1400px 900px at 80% -10%, #3b0764 0, var(--bg2) 55%),
-        radial-gradient(1200px 800px at 10% 110%, #1d4ed8 0, var(--bg1) 55%);
-      display:flex;
-      justify-content:center;
-      align-items:flex-start;
+    h1 {
+      margin-top: 40px;
+      color: #333;
     }
 
-    .wrap{
-      width:100%;
-      max-width:1100px;
-      padding:40px 24px 80px;
+    .knoppen {
+      margin-top: 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
     }
 
-    h1{
-      text-align:center;
-      font-size:clamp(40px,5vw,56px);
-      margin:0 0 24px 0;
-      letter-spacing:0.12em;
-      text-transform:uppercase;
-      color:#ffffff;
-      text-shadow:
-        0 0 18px rgba(236,72,153,.9),
-        0 0 40px rgba(88,28,135,.9);
+    button {
+      padding: 15px 30px;
+      font-size: 20px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      background: #4CAF50;
+      color: white;
+      transition: 0.2s;
     }
 
-    .cards{
-      display:flex;
-      flex-wrap:wrap;
-      gap:24px;
-      justify-content:center;
-      margin-top:16px;
-    }
-
-    .card{
-      flex:1 1 340px;
-      max-width:520px;
-      background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(15,23,42,.8));
-      border-radius:24px;
-      border:1px solid rgba(248,250,252,.12);
-      box-shadow:
-        0 18px 45px rgba(15,23,42,.75),
-        0 0 40px rgba(30,64,175,.45);
-      padding:20px 22px 24px;
-      position:relative;
-      overflow:hidden;
-    }
-
-    .card::before{
-      content:"";
-      position:absolute;
-      inset:-40%;
-      background:radial-gradient(circle at 0 0, rgba(236,72,153,.22), transparent 55%);
-      opacity:.7;
-      pointer-events:none;
-    }
-
-    .badge{
-      position:relative;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      height:40px;
-      border-radius:999px;
-      background:linear-gradient(90deg,rgba(15,23,42,.8),rgba(15,23,42,.95));
-      border:1px solid rgba(248,250,252,.14);
-      color:var(--muted);
-      font-weight:700;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      font-size:13px;
-      margin-bottom:16px;
-    }
-
-    .card-title{
-      position:relative;
-      font-size:clamp(22px,2.4vw,26px);
-      margin-bottom:10px;
-    }
-
-    .card p{
-      position:relative;
-      font-size:15px;
-      line-height:1.5;
-      color:var(--muted);
-      margin-bottom:14px;
-    }
-
-    .card p strong{
-      color:#ffffff;
-    }
-
-    ul{
-      position:relative;
-      list-style:disc;
-      padding-left:20px;
-      margin:0 0 18px 0;
-      color:var(--muted);
-      font-size:15px;
-    }
-
-    ul li+li{margin-top:4px;}
-
-    .btn-link{
-      position:relative;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:10px 26px;
-      border-radius:999px;
-      font-weight:800;
-      font-size:16px;
-      text-decoration:none;
-      color:#020617;
-      box-shadow:0 12px 30px rgba(0,0,0,.45);
-      transition:transform .12s ease, filter .15s ease;
-    }
-
-    .btn-level1{
-      background:linear-gradient(135deg,#22c55e,#4ade80);
-    }
-
-    .btn-level2{
-      background:linear-gradient(135deg,#ec4899,#a855f7);
-    }
-
-    .btn-link:hover{
-      filter:brightness(1.06);
-      transform:translateY(-1px);
-    }
-
-    .btn-link:active{
-      transform:translateY(1px);
-      filter:brightness(.98);
-    }
-
-    @media (max-width:800px){
-      .wrap{
-        padding-top:32px;
-      }
-      .cards{
-        gap:18px;
-      }
-      .card{
-        max-width:100%;
-      }
+    button:hover {
+      background: #45a049;
     }
   </style>
 </head>
+
 <body>
-  <main class="wrap">
-    <h1>Soundangles</h1>
 
-    <section class="cards">
-      <!-- LEVEL 1 -->
-      <article class="card">
-        <div class="badge">Level 1</div>
-        <h2 class="card-title">Binnen- of buitenhoek?</h2>
-        <p>
-          Is het een <strong>binnenhoek</strong> of een <strong>buitenhoek</strong>?<br>
-          Luister naar de muzikale hint en kies de juiste soort hoek.
-        </p>
-        <a class="btn-link btn-level1" href="index.html">Speel Level 1</a>
-      </article>
+<h1>Welkom bij Soundangles!</h1>
+<p>Kies een level om te beginnen.</p>
 
-      <!-- LEVEL 2 -->
-      <article class="card">
-        <div class="badge">Level 2</div>
-        <h2 class="card-title">Hoeken met muziek</h2>
-        <p>Luister naar de muzikale hint en kies de juiste soort hoek.</p>
-        <ul>
-          <li>overeenkomstige hoeken</li>
-          <li>verwisselende binnenhoeken</li>
-          <li>verwisselende buitenhoeken</li>
-          <li>binnenhoeken aan dezelfde kant van de snijlijn</li>
-          <li>buitenhoeken aan dezelfde kant van de snijlijn</li>
-        </ul>
-        <a class="btn-link btn-level2" href="level2.html">Speel Level 2</a>
-      </article>
-    </section>
-  </main>
+<div class="knoppen">
+  <button onclick="window.location.href='level1.html'">Level 1</button>
+  <button onclick="window.location.href='level2.html'">Level 2</button>
+</div>
+
 </body>
 </html>
-
-
-
