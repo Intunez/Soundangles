@@ -568,20 +568,33 @@ function playCurrentHint(){
 }
 
 /* ---------- Diagram: lijnen + oplichtende hoek ---------- */
-function drawDiagram(highlight){
-  const marks = {
-    // rond A
-    A1:{x:259,y:188}, // links-boven
-    A2:{x:319,y:123}, // boven
-    A3:{x:369,y:178}, // rechts-onder
-    A4:{x:269,y:208}, // links-onder
+function drawDiagram(highlight) {
+  // SNIJPUNTEN van de lijnen
+  // → vul hier jouw echte waarden in
+  const A = { x: 340, y: 160 };
+  const B = { x: 520, y: 320 };
 
-    //rond B 
-    B1:{x:482,y:200}, // links-boven
-    B2:{x:547,y:339}, // boven
-    B3:{x:587,y:394}, // rechts
-    B4:{x:497,y:434}  // links-onder
+  // hoeveel de hoekjes verschoven worden t.o.v. het punt
+  const dx = 30;  // horizontale afstand
+  const dy = 30;  // verticale afstand
+
+  const marks = {
+    // rond A (zoals in je LaTeX-plaatje)
+    A1: { x: A.x - dx, y: A.y - dy }, // linksboven
+    A2: { x: A.x + dx, y: A.y - dy }, // rechtsboven
+    A3: { x: A.x + dx, y: A.y + dy }, // rechtsonder
+    A4: { x: A.x - dx, y: A.y + dy }, // linksonder
+
+    // rond B
+    B1: { x: B.x - dx, y: B.y - dy }, // linksboven
+    B2: { x: B.x + dx, y: B.y - dy }, // rechtsboven
+    B3: { x: B.x + dx, y: B.y + dy }, // rechtsonder
+    B4: { x: B.x - dx, y: B.y + dy }  // linksonder
   };
+
+  // ... hier verder je cirkels/labels tekenen met marks.X.x / marks.X.y
+}
+
 
   const markStr = Object.entries(marks).map(([key,p])=>{
     const hi = key===highlight; const col = hi? '#ffb0f0' : '#f8f1ff'; const bg = hi? ' filter="url(#glow)"' : '';
