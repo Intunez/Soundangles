@@ -570,14 +570,17 @@ function playCurrentHint(){
 /* ---------- Diagram: lijnen + oplichtende hoek ---------- */
 function drawDiagram(highlight){
   const marks = {
-    A1:{x:240,y:105},
-    A2:{x:330,y:185},
-    A3:{x:290,y:185},
-    A4:{x:395,y:195},   // iets verplaatst zodat hij netter ligt
-    B1:{x:490,y:295},
-    B2:{x:599,y:489},   // iets meer naar links
-    B3:{x:490,y:385},
-    B4:{x:570,y:385}
+    // rond A
+    A1:{x:259,y:158}, // links-boven
+    A2:{x:319,y:123}, // boven
+    A3:{x:359,y:178}, // rechts-onder
+    A4:{x:269,y:208}, // links-onder
+
+    //rond B 
+    B1:{x:482,y:374}, // links-boven
+    B2:{x:547,y:339}, // boven
+    B3:{x:587,y:394}, // rechts
+    B4:{x:497,y:434}  // links-onder
   };
 
   const markStr = Object.entries(marks).map(([key,p])=>{
